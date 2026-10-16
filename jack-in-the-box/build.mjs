@@ -8,6 +8,7 @@ import * as J from "./geometry.mjs";
 const HERE = dirname(fileURLToPath(import.meta.url));
 const M = J.M;
 const P = J.fit(M);
+const draw = (items) => J.svgOf(items);
 
 const svg = k.figureSvg({
   width: M.WIDTH,
@@ -15,19 +16,21 @@ const svg = k.figureSvg({
   label:
     "A see-through jack-in-the-box on a wooden base. A coil spring stands in the box under a clown called Jack. A crank on the right wall turns a wheel inside; a peg on the wheel comes round to a latch that holds the lid shut. When the peg lifts the latch, the lid flies open and the spring pushes Jack up.",
   body: [
-    J.baseSvg(P, M),
-    J.boxBackSvg(P, M),
-    `<g data-slot="lid-open"></g>`,
-    J.springBaseSvg(P, M),
-    `<g data-part="spring">${J.springSvg(P, M, M.H_OUT)}</g>`,
-    `<g data-part="jack" transform="${k.translateAlong(P, [0, 0, M.SPRING_Z + M.H_OUT])}">${J.jackSvg(P, M)}</g>`,
-    J.wheelStaticSvg(P, M),
-    `<g data-part="wheel-live">${J.wheelLiveSvg(P, M, M.PEG_START)}</g>`,
-    `<g data-part="latch">${J.latchSvg(P, M, 0)}</g>`,
-    J.latchMountSvg(P, M),
-    `<g data-slot="lid-closed"><g data-part="lid">${J.lidSvg(P, M, M.LID_OPEN)}</g></g>`,
-    J.glassSvg(P, M),
-    `<g data-part="crank">${J.crankSvg(P, M, M.PEG_START)}</g>`,
+    draw(J.baseItems(P, M)),
+    draw(J.boxBackItems(P, M)),
+    `<g data-slot="lid-open"><g data-part="lid">${draw(J.lidTopItems(P, M, M.LID_OPEN))}</g><g data-part="lid-under">${draw(J.lidUnderItems(P, M, M.LID_OPEN))}</g></g>`,
+    draw(J.springBaseItems(P, M)),
+    `<g data-part="spring">${draw(J.springItems(P, M, M.H_OUT))}</g>`,
+    `<g data-part="jack" transform="${k.translateAlong(P, [0, 0, M.SPRING_Z + M.H_OUT])}">${draw(J.jackItems(P, M))}</g>`,
+    `<g data-part="peg">${draw(J.pegItems(P, M, M.PEG_START))}</g>`,
+    draw(J.wheelStaticItems(P, M)),
+    `<g data-part="spokes">${draw(J.spokesItems(P, M, M.PEG_START))}</g>`,
+    `<g data-slot="lid-under-closed"></g>`,
+    `<g data-part="latch">${draw(J.latchItems(P, M, 0))}</g>`,
+    draw(J.latchMountItems(P, M)),
+    draw(J.glassItems(P, M)),
+    `<g data-slot="lid-closed"></g>`,
+    `<g data-part="crank">${draw(J.crankItems(P, M, M.PEG_START))}</g>`,
     J.popSvg(P, M),
   ],
 });
@@ -151,9 +154,9 @@ const RADS = Math.PI / 180;
 const stage = document.querySelector(".iso-stage");
 const svgEl = stage.querySelector("svg");
 const q = (sel) => svgEl.querySelector(sel);
-const springEl = q('[data-part="spring"]'), jackEl = q('[data-part="jack"]'), lidEl = q('[data-part="lid"]');
-const wheelEl = q('[data-part="wheel-live"]'), crankEl = q('[data-part="crank"]'), latchEl = q('[data-part="latch"]'), popEl = q('[data-part="pop"]');
-const slots = [q('[data-slot="lid-open"]'), q('[data-slot="lid-closed"]')];
+const springEl = q('[data-part="spring"]'), jackEl = q('[data-part="jack"]'), lidEl = q('[data-part="lid"]'), lidUnderEl = q('[data-part="lid-under"]');
+const pegEl = q('[data-part="peg"]'), spokesEl = q('[data-part="spokes"]'), crankEl = q('[data-part="crank"]'), latchEl = q('[data-part="latch"]'), popEl = q('[data-part="pop"]');
+const slots = { open: q('[data-slot="lid-open"]'), closed: q('[data-slot="lid-closed"]'), under: q('[data-slot="lid-under-closed"]') };
 const readout = document.querySelector("[data-readout]");
 const subtitle = document.getElementById("subtitle"), statusText = document.getElementById("statusText");
 const pushBtn = document.getElementById("pushBtn"), turnBtn = document.getElementById("turnBtn");
@@ -218,15 +221,19 @@ function pop() {
 }
 
 function draw() {
-  if (last.h !== s.h.at) { springEl.innerHTML = springSvg(P, M, s.h.at); jackEl.setAttribute("transform", k.translateAlong(P, [0, 0, M.SPRING_Z + s.h.at])); last.h = s.h.at; }
+  if (last.h !== s.h.at) { springEl.innerHTML = svgOf(springItems(P, M, s.h.at)); jackEl.setAttribute("transform", k.translateAlong(P, [0, 0, M.SPRING_Z + s.h.at])); last.h = s.h.at; }
   if (last.theta !== s.theta.at) {
-    lidEl.innerHTML = lidSvg(P, M, s.theta.at);
-    const open = s.theta.at > 55;
-    if (open !== last.lidOpen) { slots[open ? 0 : 1].appendChild(lidEl); last.lidOpen = open; }
+    lidEl.innerHTML = svgOf(lidTopItems(P, M, s.theta.at));
+    lidUnderEl.innerHTML = svgOf(lidUnderItems(P, M, s.theta.at));
+    const open = s.theta.at > 60;
+    if (open !== last.lidOpen) {
+      if (open) { slots.open.appendChild(lidEl); slots.open.appendChild(lidUnderEl); } else { slots.under.appendChild(lidUnderEl); slots.closed.appendChild(lidEl); }
+      last.lidOpen = open;
+    }
     last.theta = s.theta.at;
   }
-  if (last.phi !== s.phi) { wheelEl.innerHTML = wheelLiveSvg(P, M, s.phi); crankEl.innerHTML = crankSvg(P, M, s.phi); last.phi = s.phi; }
-  if (last.psi !== s.psi.at) { latchEl.innerHTML = latchSvg(P, M, s.psi.at); last.psi = s.psi.at; }
+  if (last.phi !== s.phi) { pegEl.innerHTML = svgOf(pegItems(P, M, s.phi)); spokesEl.innerHTML = svgOf(spokesItems(P, M, s.phi)); crankEl.innerHTML = svgOf(crankItems(P, M, s.phi)); last.phi = s.phi; }
+  if (last.psi !== s.psi.at) { latchEl.innerHTML = svgOf(latchItems(P, M, s.psi.at)); last.psi = s.psi.at; }
 }
 
 function tick(now) {
@@ -279,6 +286,32 @@ document.addEventListener("keydown", (event) => {
 say();
 draw();
 `;
+
+// `node build.mjs --audit` proves the geometry in both rest poses: nothing sunk into
+// anything, every part held by another part down to the base, the spring's wire
+// resting on its plates, and every overlap painted in true depth order.
+if (process.argv.includes("--audit")) {
+  const A = await import("../kit/audit.mjs");
+  let failed = 0;
+  for (const pose of ["out", "in"]) {
+    const started = Date.now();
+    const R = A.recorder(P);
+    J.figureItems(P, M, pose, A).forEach((it, index) => {
+      if (!it.shapes.length) return; // the halo and the spokes draw no body of their own
+      const shapes = it.shapes.flatMap((shape) => (shape.kind === "tube" ? R.route(shape.name, shape.points, shape.radii[0], { owner: shape.owner, ends: shape.ends, touch: shape.touch }) : [R.solid(shape)]));
+      R.put({ name: it.name, key: index, shapes, svg: it.svg });
+    });
+    const overlaps = A.overlapsOf(R.items, P, { states: [0] });
+    R.settled = { items: R.items, overlaps, solved: { rules: 0, dropped: [] }, states: [0] };
+    const result = A.audit(R, P, { frames: [], apart: false });
+    console.log(`--- pose: ${pose}`);
+    console.log(A.report(result));
+    console.log(`audit · ${R.tubes.length} tubes · ${R.solids.length} solids · ${R.items.length} items · ${overlaps.pairs.length} overlaps · ${((Date.now() - started) / 1000).toFixed(1)} s`);
+    failed += A.failures(result);
+  }
+  console.log(failed ? `audit failed: ${failed} problem${failed === 1 ? "" : "s"}` : "audit passed");
+  process.exitCode = failed ? 1 : 0;
+}
 
 const script = `${kitScript()}\n${latheScript()}\n(() => {\n${geometryScript()}\n${live}\n})();`;
 const html = k
