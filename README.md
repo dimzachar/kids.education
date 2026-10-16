@@ -1,21 +1,26 @@
 # kids.education
 
-Small interactive explainers that show kids how everyday mechanisms work, with a "for grown-ups" section that adds the real physics.
+Small interactive explainers that show kids how everyday mechanisms work, each with a "for grown-ups" section that adds the real physics. Open `index.html` for the gallery.
 
-The figures are built with the drawing kit from [Anatomy](https://github.com/wheresryan22/anatomy) (MIT), a Claude skill that explains an idea by drawing it as a real, working object: solid isometric parts with four-tone shading, a framed card with a live readout, and calm, time-based motion. The kit lives in `kit/` (`iso-kit.mjs`, `lathe.mjs`, `iso.css`) with its licence beside it. We add pastel colour token sets per part on top of the kit's own shading.
+The figures are built with the drawing kit from [Anatomy](https://github.com/wheresryan22/anatomy) (MIT), a Claude skill that explains an idea by drawing it as a real, working object: solid isometric parts with four-tone shading, a framed card with a live readout, and calm, time-based motion. The kit lives in `kit/` (`iso-kit.mjs`, `lathe.mjs`, `tube.mjs`, `audit.mjs`, `iso.css`) with its licence beside it. We add pastel colour token sets per part on top of the kit's own shading, and the kid chrome around the card.
 
-## Prototypes
+## The toys
 
-| Prototype | What it teaches | Open |
+| Figure | What it teaches | Page |
 | --- | --- | --- |
-| Jack-in-the-box | Stored spring energy, a latch that holds it, and a crank with a peg that releases it | `jack-in-the-box/index.html` |
+| 1 · Jack-in-the-box | Stored spring energy, a latch that holds it, and a crank with a peg that releases it | `jack-in-the-box/` |
+| 2 · Seesaw | Levers: weight × distance, and balancing a heavy friend with a light one further out | `seesaw/` |
+| 3 · Two gears | Gear ratio: 24 teeth drive 12, so the little gear turns twice as fast the other way | `gears/` |
+| 4 · Switch and lamp | A circuit is a loop: a switch opens a gap or bridges it, and the lamp only lights when the loop is complete | `circuit/` |
 
-Each prototype ships as a single built HTML page. Open it in a browser, or serve the repo with any static server:
+Each page is a single built HTML file. Open it in a browser, or serve the repo with any static server:
 
 ```sh
 python3 -m http.server 8000
-# then visit http://localhost:8000/jack-in-the-box/
+# then visit http://localhost:8000/
 ```
+
+Every toy plays by itself when left alone, and responds to taps, buttons and the keyboard. Motion respects `prefers-reduced-motion`.
 
 ## Building
 
@@ -23,15 +28,26 @@ The pages are generated. Node 20.10+ is the only requirement; there is nothing t
 
 ```sh
 node jack-in-the-box/build.mjs
+node seesaw/build.mjs
+node gears/build.mjs
+node circuit/build.mjs
 ```
 
-- `jack-in-the-box/geometry.mjs` holds the toy's dimensions and every part. The static art (base, box, Jack) is built once; the moving parts (spring, lid with its catch pin, wheel spokes and peg, latch, crank) are functions of the model's state and are rebuilt each frame in the page from the same code.
-- `jack-in-the-box/build.mjs` frames the figure in a card, adds the kid controls and the physics notes, and inlines the kit plus the live script into `index.html`.
+Each toy has two files:
 
-## Jack-in-the-box
+- `geometry.mjs` holds the dimensions and every part as an *item*: what the page draws and, when the audit module is passed in, the shape it records. Static art is built once; the moving parts (a lid, a plank, a tooth, a switch blade) are functions of the model's state and are rebuilt each frame in the page from the same code.
+- `build.mjs` frames the figure in a card, adds the kid controls and the physics notes, and inlines the kit plus the live script into `index.html`.
 
-1. **Push Jack in.** The spring squashes, the lid closes and the latch hooks over a pin on the lid.
-2. **Turn the handle** three times. The wheel inside turns with it and the peg creeps round toward the latch. The readout counts the turns.
-3. **POP!** The peg lifts the latch, the lid flies open and the spring flings Jack up. The wheel coasts on so the latch springs back, ready for the next go.
+`shared/page.mjs` is the common page chrome and colour tokens; `shared/audit.mjs` wires the kit's audit to the item lists.
 
-Tap the toy, use the buttons, or press Space / Enter for the next step (`P` pushes, `T` turns). Left alone, the figure plays the whole sequence by itself. Motion respects `prefers-reduced-motion`.
+## Checking a figure
+
+Two of Anatomy's checks run on every toy:
+
+```sh
+node <toy>/build.mjs --audit     # the geometry audit, in each rest pose
+```
+
+The audit ray-casts every overlapping pair of parts and proves that every overlap is painted in true depth order, that nothing is sunk into anything, that every part is held by another part down to the base, and that every wire rests on its terminals with no pinched bends. It ends `audit passed`, or lists each problem.
+
+The line-end check runs the built page in headless Chrome with Anatomy's `scripts/lines.mjs` (from the upstream repo) and fails any texture line that stops in mid-air. All four pages read `line ends: 0` in every pose.

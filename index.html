@@ -1,0 +1,61 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>How does it work? Toys for curious kids</title>
+<meta name="description" content="Interactive isometric toys that show kids how everyday things work: a jack-in-the-box, a seesaw, two gears and a lamp circuit." />
+<style>
+  :root { --bg: #f3ede3; --card: #fff; --ink: #2b2a33; --muted: #6f6c7a; }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--bg); color: var(--ink); font-family: "Nunito", "Segoe UI", system-ui, -apple-system, sans-serif; padding: 48px 16px 72px; }
+  main { max-width: 760px; margin: 0 auto; }
+  h1 { text-align: center; margin: 0; font-size: clamp(1.6rem, 4.5vw, 2.4rem); letter-spacing: -0.01em; }
+  .sub { text-align: center; color: var(--muted); margin: 8px 0 32px; font-size: 1.05rem; }
+  .grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; }
+  @media (max-width: 560px) { .grid { grid-template-columns: 1fr; } }
+  a.card { display: block; background: var(--card); border-radius: 22px; padding: 22px 22px 20px; text-decoration: none; color: inherit; box-shadow: 0 14px 32px rgba(60, 40, 20, .10), 0 2px 6px rgba(60, 40, 20, .05); transition: transform .15s, box-shadow .15s; border: 2px solid transparent; }
+  a.card:hover, a.card:focus-visible { transform: translateY(-2px); box-shadow: 0 18px 40px rgba(60, 40, 20, .14), 0 2px 6px rgba(60, 40, 20, .06); outline: none; border-color: var(--c); }
+  .fig { font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace; font-size: .72rem; letter-spacing: .1em; text-transform: uppercase; color: var(--muted); display: flex; align-items: center; gap: 8px; }
+  .fig i { width: 10px; height: 10px; border-radius: 50%; background: var(--c); display: inline-block; }
+  h2 { margin: 10px 0 6px; font-size: 1.2rem; }
+  p { margin: 0; color: var(--muted); font-size: .95rem; line-height: 1.45; }
+  .ask { margin-top: 12px; font-weight: 800; color: var(--c); font-size: .95rem; }
+  footer { text-align: center; color: var(--muted); font-size: .85rem; margin-top: 36px; line-height: 1.5; }
+  footer a { color: inherit; }
+</style>
+</head>
+<body>
+<main>
+  <h1>How does it work?</h1>
+  <p class="sub">Little see-through machines you can play with. Tap, turn, push, and watch what moves.</p>
+  <div class="grid">
+    <a class="card" href="jack-in-the-box/" style="--c:#e8575f">
+      <span class="fig"><i></i>Fig 1 · Jack-in-the-box</span>
+      <h2>Why does Jack jump out?</h2>
+      <p>Push him in to squash the spring, turn the handle until the peg bumps the latch, and POP.</p>
+      <div class="ask">Play →</div>
+    </a>
+    <a class="card" href="seesaw/" style="--c:#3fae7a">
+      <span class="fig"><i></i>Fig 2 · Seesaw</span>
+      <h2>Why does the seesaw tip?</h2>
+      <p>A big friend and a little friend. Move them along the plank until it balances.</p>
+      <div class="ask">Play →</div>
+    </a>
+    <a class="card" href="gears/" style="--c:#d9a520">
+      <span class="fig"><i></i>Fig 3 · Two gears</span>
+      <h2>How do gears turn each other?</h2>
+      <p>Turn the big gear and watch the little one go round twice as fast, the other way.</p>
+      <div class="ask">Play →</div>
+    </a>
+    <a class="card" href="circuit/" style="--c:#4f8fe6">
+      <span class="fig"><i></i>Fig 4 · Switch and lamp</span>
+      <h2>Why does the lamp light up?</h2>
+      <p>A battery, a switch and a lamp. Close the gap and the loop lights up.</p>
+      <div class="ask">Play →</div>
+    </a>
+  </div>
+  <footer>Each toy is a real little machine: every part rests on another part, and the numbers in the corner come from the same model that moves it.<br />Drawn with the <a href="https://github.com/wheresryan22/anatomy">Anatomy</a> kit.</footer>
+</main>
+</body>
+</html>

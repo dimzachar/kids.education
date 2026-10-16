@@ -10,7 +10,7 @@ const strip = (file) => readFileSync(join(ROOT, file), "utf8").replace(/^export 
 export function kitScript() {
   return (
     strip("kit/iso-kit.mjs") +
-    "\nconst k = { iso, depthOf, pathOf, solidSvg, lineSvg, dotsSvg, groupSvg, translateAlong, slabOf, cylinder, extrude, circleRing, corners, insetPlan, planOutline, lineOnTop, onTop, ring, sideSeam, faceTextSvg, fadedSvg, haloOf, fitProjection, boxCorners, roundedPlan };\n"
+    "\nconst k = { iso, depthOf, pathOf, solidSvg, lineSvg, dotsSvg, groupSvg, translateAlong, slabOf, cylinder, extrude, circleRing, corners, insetPlan, planOutline, lineOnTop, onTop, ring, sideSeam, ringSeam, sideArc, sideRing, knurl, coil, topTicks, sideTicks, radialTicks, segment, rise, dotGrid, pointsAt, axisVector, faceTextSvg, fadedSvg, fadeLineSvg, wireSvg, haloOf, fitProjection, boxCorners, roundedPlan, topMatrix, sideMatrix };\n"
   );
 }
 
@@ -24,6 +24,6 @@ export function latheScript() {
   return `const G = (() => {\n${strip("kit/lathe.mjs")}\nreturn { ${names.join(", ")} };\n})();\n`;
 }
 
-export function geometryScript() {
-  return strip("jack-in-the-box/geometry.mjs");
+export function geometryScript(file = "jack-in-the-box/geometry.mjs") {
+  return strip(file);
 }
