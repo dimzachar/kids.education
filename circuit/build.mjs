@@ -49,8 +49,8 @@ const CSS = `
 .cx-flow .iso-line{stroke:#4f8fe6;stroke-width:1.6px}
 .cx-flow .iso-wire-end{fill:#4f8fe6;stroke:#2c569a}
 .cx-on .cx-flow{opacity:.9}
-.cx-glow{fill:url(#cx-glow);opacity:0;transition:opacity .5s}
-.cx-on .cx-glow{opacity:1}
+.cx-glow{fill:#ffd54a;opacity:0;filter:blur(14px);transition:opacity .5s}
+.cx-on .cx-glow{opacity:.55}
 .cx-bulb .iso-solid{transition:none}
 .cx-on .cx-bulb .jk-white{--anatomy-paper:#ffd54a;--anatomy-face:#ffe27a;--anatomy-top:#fff1b8;--anatomy-shade-0:#e8a81c;--anatomy-shade-1:#f2b82a;--anatomy-shade-2:#f9c93a;--anatomy-shade-3:#ffd54a;--anatomy-hi:#b07a0a}
 `;
@@ -59,7 +59,6 @@ const live = `
 const P = ${JSON.stringify(P)};
 const stage = document.querySelector(".iso-stage");
 const svgEl = stage.querySelector("svg");
-svgEl.insertAdjacentHTML("afterbegin", '<defs><radialGradient id="cx-glow"><stop offset="0" stop-color="#ffe27a" stop-opacity=".85"/><stop offset=".45" stop-color="#ffd54a" stop-opacity=".35"/><stop offset="1" stop-color="#ffd54a" stop-opacity="0"/></radialGradient></defs>');
 const bladeEl = svgEl.querySelector('[data-part="blade"]');
 const flipBtn = document.getElementById("flip");
 const s = { closed: false, theta: { at: ${OPEN}, rate: 0 }, on: false, clock: 0 };

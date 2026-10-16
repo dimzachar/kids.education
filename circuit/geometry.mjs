@@ -94,7 +94,7 @@ export function lampItems(P, M, A) {
     item("lamp.base", S(k.cylinder(x, y, Lp.baseR, 0, Lp.baseH, P, 32, 0.4), { className: "jk-rubber" }), when(A, () => [A.cylinder(x, y, Lp.baseR, 0, Lp.baseH, { name: "lamp.base" })])),
     item("lamp.collar", S(k.cylinder(x, y, Lp.collarR, z1, Lp.collarH, P, 28), { className: "jk-brass", inner: L(k.sideArc(x, y, Lp.collarR, z1 + 2, P, 16) + k.sideArc(x, y, Lp.collarR, z1 + 4, P, 16), { tone: "faint" }) }), when(A, () => [A.cylinder(x, y, Lp.collarR, z1, Lp.collarH, { name: "lamp.collar" })])),
     item("lamp.neck", S(k.cylinder(x, y, Lp.neckR, z2, Lp.neckH, P, 20), { className: "jk-steel", crease: "none" }), when(A, () => [A.cylinder(x, y, Lp.neckR, z2, Lp.neckH, { name: "lamp.neck" })])),
-    item("lamp.glow", `<circle class="cx-glow" cx="${gx.toFixed(1)}" cy="${gy.toFixed(1)}" r="${(Lp.bulbR * 2.6 * P.scale).toFixed(1)}"/>`),
+    item("lamp.glow", `<circle class="cx-glow" cx="${gx.toFixed(1)}" cy="${gy.toFixed(1)}" r="${(Lp.bulbR * 1.9 * P.scale).toFixed(1)}"/>`),
     item("lamp.bulb", `<g class="cx-bulb">${S(G.sphereOf(bulb, Lp.bulbR, P), { className: "jk-white" })}</g>`, when(A, () => [A.ball(bulb, Lp.bulbR, { name: "lamp.bulb" })])),
   ];
 }
