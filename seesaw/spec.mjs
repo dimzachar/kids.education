@@ -1,0 +1,42 @@
+export default {
+  id: "seesaw",
+  fig: 2,
+  family: "Levers and gears",
+  name: "Seesaw",
+  title: "Why does the seesaw tip?",
+  question: "Why does the seesaw tip?",
+  subtitle: "A big friend and a little friend. Which way will it go?",
+  blurb: "A big friend and a little friend. Move them along the plank until it balances.",
+  concept: "A lever balances when weight × distance from the pivot is the same on both sides.",
+  object: "A plank on an axle over a wooden block, with a big red friend and a little blue friend who can sit at four marked steps from the middle.",
+  hint: "Move the friends with the buttons",
+  readout: "big 2 × 2 = 4 · little 3 × 1 = 3",
+  status: "Guess first!",
+  aria: "Seesaw. Arrow keys move the little friend; Shift with arrow keys moves the big friend.",
+  keys: [
+    { mark: "red", label: "Big friend: counts double, he is twice as heavy" },
+    { mark: "blue", label: "Little friend: counts once" },
+    { mark: "green", label: "Balanced when both sides push the same: steps × weight" },
+  ],
+  caption: "A push on a seesaw is weight times distance from the middle. The little friend can balance the big one by sitting twice as far out.",
+  predict: {
+    question: "The big friend sits 2 steps out, the little friend 3 steps out. Which way does it tip?",
+    options: [
+      { label: "Big friend's side", correct: true },
+      { label: "Little friend's side", correct: false },
+      { label: "It stays level", correct: false },
+    ],
+    explain: "Big friend: 2 steps × 2 weight = 4. Little friend: 3 steps × 1 = 3. Four beats three, so the big side goes down.",
+  },
+  steps: [
+    { colour: "red", title: "Heavy pushes harder", text: "The big friend weighs twice as much, so every step he sits from the middle counts double." },
+    { colour: "blue", title: "Far out pushes harder too", text: "Sitting further from the middle gives a longer lever. Each step out is one more push." },
+    { colour: "green", title: "Same push, both sides: balanced", text: "When steps × weight is the same on both ends, the plank stays level. 2 steps × 2 equals 4 steps × 1." },
+  ],
+  home: "a ruler across a pencil, and coins for friends. Two coins on one side at 3 cm balance one coin at 6 cm.",
+  grown: [
+    ["Torque.", "The turning push on a lever is force × distance from the pivot (τ = F·d). A seesaw balances when the torques on both sides are equal."],
+    ["Why distance matters.", "A small weight far from the pivot can balance a large weight near it. This is the law of the lever Archimedes wrote down: F₁·d₁ = F₂·d₂."],
+    ["Levers everywhere.", "Crowbars, wheelbarrows, nutcrackers, scissors and your own forearm are all levers trading force for distance the same way."],
+  ],
+};

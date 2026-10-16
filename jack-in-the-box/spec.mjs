@@ -1,0 +1,42 @@
+export default {
+  id: "jack-in-the-box",
+  fig: 1,
+  family: "Storing and releasing energy",
+  name: "Jack-in-the-box",
+  title: "Why does Jack jump out?",
+  question: "Why does Jack jump out?",
+  subtitle: "Can you see the spring?",
+  blurb: "Push him in to squash the spring, turn the handle until the peg bumps the latch, and POP.",
+  concept: "A spring stores the push you give it; a latch holds it; a peg on a wheel releases it.",
+  object: "A see-through box on a wooden base with a coil spring, a clown on top of it, a hinged lid with a catch, a latch, and a crank that turns a wheel with a peg.",
+  hint: "Tap the toy, or press the buttons",
+  readout: "Jack is out · spring stretched",
+  status: "Jack is out",
+  aria: "Jack-in-the-box. Space or Enter does the next step: push Jack in, then turn the handle three times. P pushes, T turns.",
+  keys: [
+    { mark: "red", label: "Jack: he squashes the spring when you push him in" },
+    { mark: "blue", label: "Spring: it stores the push until the latch lets go" },
+    { mark: "lit", label: "Handle, wheel and peg: three turns bring the peg round to the latch" },
+  ],
+  caption: "The handle is not a motor. It only winds a peg round to the latch; the push you stored in the spring does all the jumping.",
+  predict: {
+    question: "Push Jack in and turn the handle. What happens?",
+    options: [
+      { label: "He pops back out", correct: true },
+      { label: "He stays in", correct: false },
+    ],
+    explain: "The handle does not lift Jack. It winds a peg round to the latch; when the latch lets go, the squashed spring does the jumping.",
+  },
+  steps: [
+    { colour: "red", title: "Push Jack down", text: "Jack squashes the spring. The lid shuts and the latch hooks over a pin on the lid." },
+    { colour: "yellow", title: "Turn the handle", text: "The handle spins the wheel inside. A peg on the wheel creeps round toward the latch." },
+    { colour: "blue", title: "The spring lets go", text: "The peg bumps the latch off the pin. The squashed spring stretches and shoves Jack up. POP!" },
+  ],
+  home: "a cardboard box, a spring from a ballpoint pen glued under a bottle-cap head, a paperclip bent into a latch over the lid, and a pencil through the side with a blob of clay for the peg.",
+  grown: [
+    ["Stored energy.", "Pushing Jack down compresses the spring. The work you do is kept as elastic potential energy, about ½·k·x² for a spring of stiffness k squashed by x."],
+    ["The latch is a catch.", "It holds the lid shut against the spring's push, so nothing moves until it is released."],
+    ["The crank is a trigger, not a motor.", "It turns a wheel carrying a peg, a one-lobe cam. The peg touches the latch only once per turn, which is why the pop is a surprise. Real toys put a music-box comb on the same shaft so the tune plays while the peg creeps round."],
+    ["Release.", "When the peg lifts the latch, the stored energy turns into motion almost at once and the spring flings Jack upward. He bounces because the spring overshoots its rest length and settles."],
+  ],
+};

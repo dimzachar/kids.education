@@ -19,9 +19,15 @@ export function latheScript() {
   const names = [
     "dot3", "add3", "sub3", "mul3", "len3", "unit3", "cross3", "lerp3", "viewOf", "lightOf", "scaleOf",
     "frameAlong", "frameOf", "pointOf", "radialOf", "tangentOf", "hullOf", "lathe", "solidOf", "disc", "ringBand",
-    "sphereOf", "prismOf", "stadium", "arcOf", "circleOf", "spokesOf", "dotsOf", "ribsOf", "fadeOf",
+    "sphereOf", "prismOf", "stadium", "arcOf", "circleOf", "spokesOf", "dotsOf", "ribsOf", "fadeOf", "angleToward",
+    "fillet", "resample", "pathLength", "cut", "pointAlong", "tangentAlong", "spiral", "arcPoints", "saddleOf", "bandsOf", "silhouetteOf", "facingOf", "rodOut",
   ];
   return `const G = (() => {\n${strip("kit/lathe.mjs")}\nreturn { ${names.join(", ")} };\n})();\n`;
+}
+
+// kit/tube.mjs, for pages that rebuild a rope or cable per frame.
+export function tubeScript() {
+  return `const { tubePieces, tubeSvg } = (() => {\n${strip("kit/tube.mjs")}\nreturn { tubePieces, tubeSvg };\n})();\n`;
 }
 
 export function geometryScript(file = "jack-in-the-box/geometry.mjs") {

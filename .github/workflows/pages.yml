@@ -24,14 +24,15 @@ jobs:
           node-version: 22
       - name: Build every toy and prove its geometry
         run: |
-          for toy in jack-in-the-box seesaw gears circuit; do
+          for toy in jack-in-the-box seesaw gears circuit pulley; do
             node "$toy/build.mjs" --audit
           done
+          node build-site.mjs
       - name: Collect the site
         run: |
           mkdir -p _site
           cp index.html _site/
-          for toy in jack-in-the-box seesaw gears circuit; do
+          for toy in jack-in-the-box seesaw gears circuit pulley; do
             mkdir -p "_site/$toy"
             cp "$toy/index.html" "_site/$toy/"
           done

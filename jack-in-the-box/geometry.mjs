@@ -301,8 +301,20 @@ export function popSvg(P, M) {
 
 export const svgOf = (items) => items.map((it) => it.svg).join("");
 
+// Which assembly each part leaves with when the toy is taken apart.
+export function pieceOf(name) {
+  if (name.startsWith("lid")) return "lid";
+  if (name.startsWith("jack") || name.startsWith("spring")) return "jack";
+  if (name === "box.front" || name === "box.right") return "glass";
+  if (name.startsWith("crank")) return "crank";
+  return "";
+}
+
 // The whole figure in one pose, in painter's order. `pose` is "out" or "in".
 export function figureItems(P, M, pose, A) {
+  return figureOrder(P, M, pose, A).map((it) => ({ ...it, piece: pieceOf(it.name) }));
+}
+function figureOrder(P, M, pose, A) {
   const h = pose === "in" ? M.H_IN : M.H_OUT;
   const theta = pose === "in" ? 0 : M.LID_OPEN;
   const open = theta > 60;

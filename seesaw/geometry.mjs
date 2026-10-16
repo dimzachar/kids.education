@@ -27,7 +27,7 @@ const RAD = Math.PI / 180;
 const Fy = (o) => G.frameOf(o, [0, 1, 0], [1, 0, 0], [0, 0, 1]); // along y: (x, z) in the frame plane
 const S = (paths, style) => k.solidSvg(paths, style);
 const L = (d, style) => k.lineSvg(d, style);
-const item = (name, svg, shapes) => ({ name, svg, shapes: shapes ?? [] });
+const item = (name, svg, shapes, piece) => ({ name, svg, shapes: shapes ?? [], piece });
 const when = (A, make) => (A ? make() : []);
 const turn = (deg) => {
   const c = Math.cos(deg * RAD);
@@ -74,13 +74,13 @@ export function pivotItems(P, M, A) {
   return {
     far: [
       item("pivot.block", wedge, when(A, () => [A.prism(F, M.WEDGE, -M.WEDGE_D, M.WEDGE_D, { name: "pivot.block" })])),
-      item("axle.cap.far", S(G.disc(-h - 2, -h, 4, Fa, P), { className: "jk-steel" }), when(A, () => [A.disc(Fa, -h - 2, -h, 4, { name: "axle.cap.far", owner: "axle" })])),
+      item("axle.cap.far", S(G.disc(-h - 2, -h, 4, Fa, P), { className: "jk-steel" }), when(A, () => [A.disc(Fa, -h - 2, -h, 4, { name: "axle.cap.far", owner: "axle" })]), "axle"),
       // the axle: its far end shows, its middle hides under the plank, its near end is drawn after the plank
-      item("axle.far", S(G.disc(-h, -w, r, Fa, P), { className: "jk-steel", crease: "none" }), when(A, () => [A.disc(Fa, -h, w, r, { name: "axle", owner: "axle" })])),
+      item("axle.far", S(G.disc(-h, -w, r, Fa, P), { className: "jk-steel", crease: "none" }), when(A, () => [A.disc(Fa, -h, w, r, { name: "axle", owner: "axle" })]), "axle"),
     ],
     near: [
-      item("axle.near", S(G.disc(w, h, r, Fa, P), { className: "jk-steel", crease: "none" }), when(A, () => [A.disc(Fa, w, h, r, { name: "axle.near", owner: "axle" })])),
-      item("axle.cap.near", S(G.disc(h, h + 2, 4, Fa, P), { className: "jk-steel" }), when(A, () => [A.disc(Fa, h, h + 2, 4, { name: "axle.cap.near", owner: "axle" })])),
+      item("axle.near", S(G.disc(w, h, r, Fa, P), { className: "jk-steel", crease: "none" }), when(A, () => [A.disc(Fa, w, h, r, { name: "axle.near", owner: "axle" })]), "axle"),
+      item("axle.cap.near", S(G.disc(h, h + 2, 4, Fa, P), { className: "jk-steel" }), when(A, () => [A.disc(Fa, h, h + 2, 4, { name: "axle.cap.near", owner: "axle" })]), "axle"),
     ],
   };
 }
@@ -110,6 +110,9 @@ function rider(P, M, A, name, who, cls, pos, theta) {
 
 // Everything that turns with the plank: the plank, its seat marks and both friends.
 export function seesawItems(P, M, big, little, theta, A) {
+  return seesawParts(P, M, big, little, theta, A).map((it) => ({ ...it, piece: "plank" }));
+}
+function seesawParts(P, M, big, little, theta, A) {
   const Fa = Fy([0, 0, M.AXLE_Z]);
   const R = turn(theta);
   const { half, w, z0, z1 } = M.PLANK;

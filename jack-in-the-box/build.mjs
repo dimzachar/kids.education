@@ -3,14 +3,20 @@ import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 import * as k from "../kit/iso-kit.mjs";
 import * as A from "../kit/audit.mjs";
-import { kidsPage, statusHtml } from "../shared/page.mjs";
+import { kidsPage } from "../shared/page.mjs";
 import { auditPoses } from "../shared/audit.mjs";
+import spec from "./spec.mjs";
 import * as J from "./geometry.mjs";
 
 const HERE = dirname(fileURLToPath(import.meta.url));
 const M = J.M;
 const P = J.fit(M);
 const draw = (items) => J.svgOf(items);
+const piece = (name, inner) => `<g data-piece="${name}">${inner}</g>`;
+
+// Taking it apart: the crank slides out of the wall first, then the lid lifts
+// away, Jack rises with his spring, and the two glass walls step out.
+const EXPLODE = { order: ["crank", "lid", "jack", "glass"], moves: { crank: [40, 0, 0], lid: [0, 0, 50], jack: [0, 0, 40], glass: [24, 24, 0] } };
 
 const svg = k.figureSvg({
   width: M.WIDTH,
@@ -20,35 +26,19 @@ const svg = k.figureSvg({
   body: [
     draw(J.baseItems(P, M)),
     draw(J.boxBackItems(P, M)),
-    `<g data-slot="lid-open"><g data-part="lid">${draw(J.lidTopItems(P, M, M.LID_OPEN))}</g><g data-part="lid-under">${draw(J.lidUnderItems(P, M, M.LID_OPEN))}</g></g>`,
-    draw(J.springBaseItems(P, M)),
-    `<g data-part="spring">${draw(J.springItems(P, M, M.H_OUT))}</g>`,
-    `<g data-part="jack" transform="${k.translateAlong(P, [0, 0, M.SPRING_Z + M.H_OUT])}">${draw(J.jackItems(P, M))}</g>`,
+    piece("lid", `<g data-slot="lid-open"><g data-part="lid">${draw(J.lidTopItems(P, M, M.LID_OPEN))}</g><g data-part="lid-under">${draw(J.lidUnderItems(P, M, M.LID_OPEN))}</g></g>`),
+    piece("jack", `${draw(J.springBaseItems(P, M))}<g data-part="spring">${draw(J.springItems(P, M, M.H_OUT))}</g><g data-part="jack" transform="${k.translateAlong(P, [0, 0, M.SPRING_Z + M.H_OUT])}">${draw(J.jackItems(P, M))}</g>`),
     `<g data-part="peg">${draw(J.pegItems(P, M, M.PEG_START))}</g>`,
     draw(J.wheelStaticItems(P, M)),
     `<g data-part="spokes">${draw(J.spokesItems(P, M, M.PEG_START))}</g>`,
-    `<g data-slot="lid-under-closed"></g>`,
+    piece("lid", `<g data-slot="lid-under-closed"></g>`),
     `<g data-part="latch">${draw(J.latchItems(P, M, 0))}</g>`,
     draw(J.latchMountItems(P, M)),
-    draw(J.glassItems(P, M)),
-    `<g data-slot="lid-closed"></g>`,
-    `<g data-part="crank">${draw(J.crankItems(P, M, M.PEG_START))}</g>`,
+    piece("glass", draw(J.glassItems(P, M))),
+    piece("lid", `<g data-slot="lid-closed"></g>`),
+    piece("crank", `<g data-part="crank">${draw(J.crankItems(P, M, M.PEG_START))}</g>`),
     J.popSvg(P, M),
   ],
-});
-
-const plate = k.plateHtml({
-  fig: "Fig 1",
-  title: "Jack-in-the-box",
-  hint: "Tap the toy, or press the buttons",
-  readout: "Jack is out · spring stretched",
-  keys: [
-    { mark: "red", label: "Jack: he squashes the spring when you push him in" },
-    { mark: "blue", label: "Spring: it stores the push until the latch lets go" },
-    { mark: "lit", label: "Handle, wheel and peg: three turns bring the peg round to the latch" },
-  ],
-  caption: "The handle is not a motor. It only winds a peg round to the latch; the push you stored in the spring does all the jumping.",
-  body: `<div class="iso-stage" tabindex="0" role="group" aria-label="Jack-in-the-box. Space or Enter does the next step: push Jack in, then turn the handle three times. P pushes, T turns.">${svg}</div>`,
 });
 
 const CSS = `
@@ -87,6 +77,7 @@ const s = {
 };
 const last = { h: null, theta: null, phi: null, psi: null, lidOpen: true };
 let frame = 0, lastNow = 0, visible = false, touring = !still.matches, tourAt = 1.6, quietUntil = 0;
+const apart = explodeOf(stage, P, run);
 
 const words = () => {
   const n = s.turnsLeft;
@@ -141,7 +132,7 @@ function tick(now) {
   lastNow = now;
   const calm = still.matches;
   s.clock += dt;
-  if (touring && s.clock >= quietUntil && s.clock >= tourAt) {
+  if (touring && predicted && s.clock >= quietUntil && s.clock >= tourAt) {
     if (s.state === "out") { push(); tourAt = s.clock + 3; }
     else if (s.state === "in") { turnHandle(); tourAt = s.clock + 1.15; }
   }
@@ -158,9 +149,10 @@ function tick(now) {
   const thetaSettled = springStep(s.theta, s.thetaTarget, dt, s.thetaK, calm);
   if (s.theta.at < 0) { s.theta.at = 0; s.theta.rate *= -0.15; }
   if (s.state === "pop" && hSettled && thetaSettled) { s.state = "out"; tourAt = s.clock + 2.4; say(); }
+  const moving = apart.tick(dt, calm);
   draw();
   const popping = s.clock < s.popUntil;
-  const settled = !touring && hSettled && thetaSettled && psiSettled && s.phi === s.phiTarget && !popping && (s.state === "out" || s.state === "in");
+  const settled = !touring && !moving && hSettled && thetaSettled && psiSettled && s.phi === s.phiTarget && !popping && (s.state === "out" || s.state === "in");
   frame = visible && !settled ? requestAnimationFrame(tick) : 0;
 }
 function run() { if (!frame && visible) { lastNow = 0; frame = requestAnimationFrame(tick); } }
@@ -182,35 +174,24 @@ document.addEventListener("keydown", (event) => {
   if (key === "p") { takeOver(); push(); }
   if (key === "t") { takeOver(); turnHandle(); }
 });
+armPredict(() => { takeOver(); push(); });
 say();
 draw();
 `;
 
 // `node build.mjs --audit` proves the geometry in both rest poses.
-auditPoses(P, { out: J.figureItems(P, M, "out", A), in: J.figureItems(P, M, "in", A) });
+auditPoses(P, { out: { items: J.figureItems(P, M, "out", A), ...EXPLODE }, in: J.figureItems(P, M, "in", A) });
 
 const html = kidsPage({
-  title: "Why does Jack jump out?",
-  subtitle: "Can you see the spring?",
-  plate,
+  spec,
+  svg,
   controls: `
   <button class="jk-btn jk-btn-red" id="pushBtn" type="button">Push Jack in</button>
-  <button class="jk-btn jk-btn-beige" id="turnBtn" type="button" disabled>Turn the handle</button>
-  ${statusHtml("Jack is out")}`,
-  steps: [
-    { colour: "red", title: "Push Jack down", text: "Jack squashes the spring. The lid shuts and the latch hooks over a pin on the lid." },
-    { colour: "yellow", title: "Turn the handle", text: "The handle spins the wheel inside. A peg on the wheel creeps round toward the latch." },
-    { colour: "blue", title: "The spring lets go", text: "The peg bumps the latch off the pin. The squashed spring stretches and shoves Jack up. POP!" },
-  ],
-  grown: [
-    ["Stored energy.", "Pushing Jack down compresses the spring. The work you do is kept as elastic potential energy, about ½·k·x² for a spring of stiffness k squashed by x."],
-    ["The latch is a catch.", "It holds the lid shut against the spring's push, so nothing moves until it is released."],
-    ["The crank is a trigger, not a motor.", "It turns a wheel carrying a peg, a one-lobe cam. The peg touches the latch only once per turn, which is why the pop is a surprise. Real toys put a music-box comb on the same shaft so the tune plays while the peg creeps round."],
-    ["Release.", "When the peg lifts the latch, the stored energy turns into motion almost at once and the spring flings Jack upward. He bounces because the spring overshoots its rest length and settles."],
-  ],
+  <button class="jk-btn jk-btn-beige" id="turnBtn" type="button" disabled>Turn the handle</button>`,
   css: CSS,
   live,
   geometry: "jack-in-the-box/geometry.mjs",
+  explode: EXPLODE,
 });
 writeFileSync(join(HERE, "index.html"), html);
 console.log("wrote jack-in-the-box/index.html", (html.length / 1024).toFixed(0) + " KB");

@@ -125,7 +125,8 @@ export function wireItems(P, M, A) {
     pieces.forEach((piece, index) => {
       out.push({
         ...item(`${route.name}#${index}`, `<g class="cx-wire">${tubeSvg(piece, { tone: "lo" })}</g>`),
-        route: A ? { name: route.name, points: route.points, r: M.WIRE_R, limp: true, touch: ["stand.board"] } : undefined,
+        route: A ? { name: route.name, points: route.points, r: M.WIRE_R, limp: true, touch: ["stand.board"], free: [true, true] } : undefined,
+        chunk: piece.points,
         at: piece.mid,
       });
     });
@@ -146,6 +147,15 @@ export function flowSvg(P, M) {
 
 export const svgOf = (items) => items.map((it) => it.svg).join("");
 
+// Which assembly each part leaves with when the toy is taken apart: the holder,
+// the switch base and the lamp base stay on the board with the wires.
+export function pieceOf(name) {
+  if (/^battery\.(body|band|plus|minus)$/.test(name)) return "battery";
+  if (/^switch\.(post|clip|blade)$/.test(name)) return "switch";
+  if (/^lamp\.(collar|neck|glow|bulb)$/.test(name)) return "lamp";
+  return "";
+}
+
 export function figureItems(P, M, deg, A) {
-  return [...boardItems(P, M, A), ...batteryItems(P, M, A), ...switchBaseItems(P, M, A), ...bladeItems(P, M, deg, A), ...lampItems(P, M, A), ...wireItems(P, M, A)];
+  return [...boardItems(P, M, A), ...batteryItems(P, M, A), ...switchBaseItems(P, M, A), ...bladeItems(P, M, deg, A), ...lampItems(P, M, A), ...wireItems(P, M, A)].map((it) => ({ ...it, piece: pieceOf(it.name) }));
 }

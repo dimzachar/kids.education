@@ -122,7 +122,7 @@ export function gearItems(P, M, gear, name, deg, A) {
 // Both gears' parts, painted back to front by the depth of each part's centre.
 export function gearsItems(P, M, big, A) {
   const all = [...gearItems(P, M, M.BIG, "big", big, A), ...gearItems(P, M, M.LITTLE, "little", littleAngle(M, big), A)];
-  return all.sort((p, q) => k.depthOf(p.at, P) - k.depthOf(q.at, P));
+  return all.sort((p, q) => k.depthOf(p.at, P) - k.depthOf(q.at, P)).map((it) => ({ ...it, piece: "gears" }));
 }
 
 export const svgOf = (items) => items.map((it) => it.svg).join("");

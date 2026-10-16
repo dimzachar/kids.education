@@ -1,0 +1,40 @@
+export default {
+  id: "gears",
+  fig: 3,
+  family: "Levers and gears",
+  name: "Two gears",
+  title: "How do gears turn each other?",
+  question: "How do gears turn each other?",
+  subtitle: "Turn the big gear and watch the little one.",
+  blurb: "Turn the big gear and watch the little one go round twice as fast, the other way.",
+  concept: "Meshing gears turn opposite ways, at speeds in the inverse ratio of their tooth counts.",
+  object: "A 24-tooth brass gear with a crank knob meshing with a 12-tooth gear on a wooden board, each with a pointer on top.",
+  hint: "Turn the big gear with the buttons",
+  readout: "big gear 0.00 turns · little gear 0.00 turns",
+  status: "Guess first!",
+  aria: "Two meshing gears. Right arrow turns the big gear a quarter turn, left arrow turns it back.",
+  keys: [
+    { mark: "red", label: "Big gear, 24 teeth: turn it by the knob" },
+    { mark: "blue", label: "Little gear, 12 teeth: it follows, twice as fast, the other way" },
+  ],
+  caption: "Each tooth of the big gear pushes one tooth of the little gear past. Twenty-four pushes turn a 12-tooth gear round twice.",
+  predict: {
+    question: "Turn the big gear. Which way does the little gear turn?",
+    options: [
+      { label: "The other way", correct: true },
+      { label: "The same way", correct: false },
+    ],
+    explain: "Where the teeth meet, both gears move in the same direction, so one turns clockwise and the other anticlockwise.",
+  },
+  steps: [
+    { colour: "red", title: "Teeth push teeth", text: "The teeth of one gear fit into the gaps of the other. When one turns, it shoves the next gear round." },
+    { colour: "blue", title: "Little gear, twice the turns", text: "24 teeth push 12 teeth past. By the time the big gear has gone round once, the little one has gone round twice." },
+    { colour: "yellow", title: "The other way round", text: "Gears that touch always turn opposite ways. Watch the pointers: one goes clockwise, the other anticlockwise." },
+  ],
+  home: "two bottle caps with corrugated cardboard glued round the rims, pinned to a box so the teeth mesh.",
+  grown: [
+    ["Gear ratio.", "Two meshing gears turn at speeds in the inverse ratio of their tooth counts: 24 : 12 means the little gear spins 2× faster. Its torque is 2× smaller: gears trade speed for force, like levers."],
+    ["Why the teeth don't slip.", "Both gears share the same tooth size (the module, 3 units here), so their pitch circles roll on each other without sliding. Real teeth have an involute shape so the push stays smooth through every angle."],
+    ["Where you meet them.", "Bicycle sprockets and chains, clock movements, egg beaters, car gearboxes and wind-up toys all use the same idea to speed things up or slow them down."],
+  ],
+};
