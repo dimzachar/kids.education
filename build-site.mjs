@@ -1,7 +1,9 @@
 // Writes the gallery from every toy's spec. Run after the toys are built.
-import { writeFileSync } from "node:fs";
+import { readFileSync, writeFileSync } from "node:fs";
+import { createHash } from "node:crypto";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
+import { SITE, FAVICON_SVG, headExtras } from "./shared/site.mjs";
 
 const HERE = dirname(fileURLToPath(import.meta.url));
 export const TOYS = ["jack-in-the-box", "seesaw", "gears", "circuit", "pulley"];
@@ -35,8 +37,7 @@ const html = `<!doctype html>
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>How does it work? Toys for curious kids</title>
-<meta name="description" content="Interactive isometric toys that show kids how everyday things work: ${specs.map((s) => s.name.toLowerCase()).join(", ")}." />
+<title>How does it work? Toys for curious kids</title>${headExtras({ title: SITE.name, description: `${SITE.description} ${specs.map((s) => s.name).join(", ")}.`, path: "/" })}
 <style>
   :root { --bg: #f3ede3; --card: #fff; --ink: #2b2a33; --muted: #6f6c7a; }
   * { box-sizing: border-box; }
@@ -70,4 +71,29 @@ const html = `<!doctype html>
 </html>
 `;
 writeFileSync(join(HERE, "index.html"), html);
-console.log("wrote index.html for", specs.length, "toys");
+writeFileSync(join(HERE, "favicon.svg"), FAVICON_SVG);
+writeFileSync(join(HERE, "robots.txt"), `User-agent: *\nAllow: /\nSitemap: ${SITE.url}/sitemap.xml\n`);
+const pages = ["/", ...specs.map((s) => `/${s.id}/`)];
+writeFileSync(join(HERE, "sitemap.xml"), `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${pages.map((p) => `  <url><loc>${SITE.url}${p}</loc></url>`).join("\n")}\n</urlset>\n`);
+writeFileSync(
+  join(HERE, "manifest.webmanifest"),
+  JSON.stringify({ name: SITE.name, short_name: "How does it work?", description: SITE.description, start_url: "/", display: "standalone", background_color: SITE.themeColor, theme_color: SITE.themeColor, icons: [{ src: "/favicon.svg", sizes: "any", type: "image/svg+xml" }] }, null, 2) + "\n",
+);
+// An offline worker: the pages are self-contained, so caching them is the whole app.
+// The cache is named after the pages' contents, so a rebuild that changes nothing
+// keeps the name (and the build stays reproducible for the check workflow).
+const stamp = createHash("sha1").update(html).update(specs.map((s) => readFileSync(join(HERE, s.id, "index.html"), "utf8")).join("")).digest("hex").slice(0, 10);
+writeFileSync(
+  join(HERE, "sw.js"),
+  `const CACHE = "toys-${stamp}";
+const PAGES = ${JSON.stringify([...pages, "/favicon.svg", "/manifest.webmanifest"])};
+self.addEventListener("install", (e) => { e.waitUntil(caches.open(CACHE).then((c) => c.addAll(PAGES)).then(() => self.skipWaiting())); });
+self.addEventListener("activate", (e) => { e.waitUntil(caches.keys().then((keys) => Promise.all(keys.filter((k) => k !== CACHE).map((k) => caches.delete(k)))).then(() => self.clients.claim())); });
+self.addEventListener("fetch", (e) => {
+  const url = new URL(e.request.url);
+  if (e.request.method !== "GET" || url.origin !== location.origin || url.pathname.startsWith("/_vercel/")) return;
+  e.respondWith(fetch(e.request).then((res) => { const copy = res.clone(); caches.open(CACHE).then((c) => c.put(e.request, copy)); return res; }).catch(() => caches.match(e.request, { ignoreSearch: true })));
+});
+`,
+);
+console.log("wrote index.html, sitemap, robots, manifest, worker and icon for", specs.length, "toys");

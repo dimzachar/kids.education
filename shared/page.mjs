@@ -1,6 +1,7 @@
 import * as k from "../kit/iso-kit.mjs";
 import { kitScript, latheScript, tubeScript, geometryScript } from "../scripts/inline-kit.mjs";
 import { SPRING } from "./audit.mjs";
+import { headExtras, TRACK_JS } from "./site.mjs";
 
 // The kid chrome around a kit figure: warm page, soft card, big pill buttons,
 // a predict-first card, numbered step cards and a grown-ups section. Colour
@@ -86,6 +87,7 @@ body{font-family:"Nunito","Segoe UI",system-ui,-apple-system,sans-serif}
 // Inlined inside the page's own closure.
 export const LIVE_COMMON = `
 const SPRING = ${JSON.stringify(SPRING)};
+${TRACK_JS}
 const still = matchMedia("(prefers-reduced-motion: reduce)");
 const clamp = (v, lo, hi) => Math.min(hi, Math.max(lo, v));
 const smoothstep = (a, b, x) => { const t = clamp((x - a) / (b - a), 0, 1); return t * t * (3 - 2 * t); };
@@ -123,6 +125,7 @@ function armPredict(onAnswer) {
     verdict.hidden = false;
     predictEl.classList.add("answered");
     predicted = true;
+    track("guess", { toy: document.body.dataset.toy, right: ok });
     setTimeout(() => { explain.hidden = false; }, 1800);
     onAnswer(ok);
   }));
@@ -146,6 +149,7 @@ function explodeOf(stage, P, run) {
         if (s.target === goal) s.pending = null; else s.pending = { value: goal, at: self.clock + index++ * SPRING.stagger };
       }
       if (btn) btn.textContent = value ? "Put it together" : "Take it apart";
+      if (value) track("apart", { toy: document.body.dataset.toy });
       run();
     },
     toggle() { self.set(!self.apart); },
@@ -224,5 +228,9 @@ ${spec.home ? `<div class="jk-home"><b>Build it at home:</b> ${esc(spec.home)}</
 ${grownHtml(spec.grown)}
 `;
   const script = `${kitScript()}\n${latheScript()}\n${tubeScript()}\n(() => {\n${geometryScript(geometry)}\n${LIVE_COMMON}\n${live}\n})();`;
-  return k.pageHtml({ title: spec.title, theme: "light", body, script, width }).replace("</style>", `${KIDS_CSS}${css}</style>`);
+  return k
+    .pageHtml({ title: spec.title, theme: "light", body, script, width })
+    .replace("</style>", `${KIDS_CSS}${css}</style>`)
+    .replace("</head>", `${headExtras({ title: spec.title, description: spec.blurb, path: `/${spec.id}/`, depth: 1 })}</head>`)
+    .replace('<body class="iso" data-theme="light">', `<body class="iso" data-theme="light" data-toy="${spec.id}">`);
 }

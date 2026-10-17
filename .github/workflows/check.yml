@@ -1,0 +1,33 @@
+name: Check the toys
+
+# Vercel deploys the site straight from the repository. This workflow only
+# proves that what was pushed is sound: every toy builds, its geometry audit
+# passes (assembled, apart and in every explode frame), and the committed pages
+# are the ones the sources produce.
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Build every toy and prove its geometry
+        run: |
+          for toy in jack-in-the-box seesaw gears circuit pulley; do
+            node "$toy/build.mjs" --audit
+          done
+          node build-site.mjs
+      - name: The committed pages match their sources
+        run: |
+          git diff --exit-code --stat -- '*.html' sw.js sitemap.xml robots.txt manifest.webmanifest favicon.svg \
+            || { echo "::error::Rebuild and commit: the pages differ from what the sources produce."; exit 1; }

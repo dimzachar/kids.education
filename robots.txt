@@ -1,0 +1,3 @@
+User-agent: *
+Allow: /
+Sitemap: https://kidseducation-beta.vercel.app/sitemap.xml

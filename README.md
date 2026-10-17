@@ -46,6 +46,14 @@ Each toy has three files:
 2. In `geometry.mjs`, build the parts with the kit (`kit/iso-kit.mjs` for prisms, `kit/lathe.mjs` for turned parts, `kit/tube.mjs` for ropes and wires). Give every item a name, a shape and its assembly.
 3. Add the toy's id to `TOYS` in `build-site.mjs` and to the workflow, and run its build with `--audit` until it ends `audit passed`.
 
+## The site
+
+The site is hosted on Vercel at [kidseducation-beta.vercel.app](https://kidseducation-beta.vercel.app/), deployed from this repository on every push; there is no build step on Vercel, the committed pages are served as they are. `vercel.json` only adds headers. `shared/site.mjs` names the site and gives every page its head: description and social preview tags (`preview.png`), the icon, the web manifest, the offline worker (`sw.js`, which caches the pages so a toy opened once keeps working without a connection), and Vercel's cookieless Web Analytics and Speed Insights. The analytics scripts load only on the Vercel host and record page views plus three kid-level events: `guess` (which option, and whether it was right), `pop` and `apart`. Turn Web Analytics and Speed Insights on in the Vercel project for the data to show up.
+
+`build-site.mjs` writes the gallery, `favicon.svg`, `robots.txt`, `sitemap.xml`, `manifest.webmanifest` and `sw.js`; `preview.png` is a screenshot of the gallery at 1200 × 630.
+
+The GitHub workflow in `.github/workflows/check.yml` does not deploy: it builds every toy with `--audit` and fails if the committed pages differ from what the sources produce, so always rebuild before committing.
+
 ## Checking a figure
 
 Two of Anatomy's checks run on every toy:

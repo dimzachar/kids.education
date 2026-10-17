@@ -1,0 +1,16 @@
+{
+  "name": "How does it work?",
+  "short_name": "How does it work?",
+  "description": "Little see-through machines kids can play with: guess first, then push, turn and pull, and watch what moves.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#f3ede3",
+  "theme_color": "#f3ede3",
+  "icons": [
+    {
+      "src": "/favicon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml"
+    }
+  ]
+}
